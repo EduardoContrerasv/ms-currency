@@ -7,11 +7,12 @@ import cl.duoc.ms_currency.model.UserCurrency;
 import cl.duoc.ms_currency.repository.CurrencyRepository;
 import cl.duoc.ms_currency.service.CurrencyService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class CurrencyServiceImpl implements CurrencyService {
@@ -20,7 +21,7 @@ public class CurrencyServiceImpl implements CurrencyService {
 
     @Override
     public void addCurrency(Long userId, CurrencyRequestDto dto) {
-
+        log.info("Adding currency to database for userId:{}",userId);
         UserCurrency wallet = repository.findByUserIdAndCurrencyType(userId, dto.getCurrencyType())
                 .orElseGet(() -> {
                     UserCurrency newWallet = new UserCurrency();
@@ -36,7 +37,7 @@ public class CurrencyServiceImpl implements CurrencyService {
 
     @Override
     public void deductCurrency(Long userId, CurrencyRequestDto dto) {
-
+        log.info("Deducting currency to database for userId:{}",userId);
         UserCurrency wallet = repository.findByUserIdAndCurrencyType(userId, dto.getCurrencyType())
                 .orElseThrow(() -> new RuntimeException("Billetera no encontrada para esta moneda"));
 
@@ -50,6 +51,7 @@ public class CurrencyServiceImpl implements CurrencyService {
 
     @Override
     public List<CurrencyResponseDto> getAllBalances(Long userId) {
+        log.info("Getting currencies for userId:{}",userId);
         List<UserCurrency> rawWallets = repository.findByUserId(userId);
 
         return rawWallets.stream()
@@ -62,6 +64,7 @@ public class CurrencyServiceImpl implements CurrencyService {
 
     @Override
     public int getSpecificBalance(Long userId, CurrencyType currencyType) {
+        log.info("Getting balance for userId:{}",userId);
         return repository.findByUserIdAndCurrencyType(userId, currencyType)
                 .map(UserCurrency::getAmount)
                 .orElse(0);

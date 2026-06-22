@@ -8,7 +8,9 @@ import cl.duoc.ms_currency.repository.CurrencyRepository;
 import cl.duoc.ms_currency.service.CurrencyService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -39,7 +41,7 @@ public class CurrencyServiceImpl implements CurrencyService {
     public void deductCurrency(Long userId, CurrencyRequestDto dto) {
         log.info("Deducting currency to database for userId:{}",userId);
         UserCurrency wallet = repository.findByUserIdAndCurrencyType(userId, dto.getCurrencyType())
-                .orElseThrow(() -> new RuntimeException("Billetera no encontrada para esta moneda"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Billetera no encontrada para esta moneda"));
 
         if (wallet.getAmount() < dto.getAmount()) {
             throw new RuntimeException("Fondos insuficientes. Tienes: " + wallet.getAmount() + " " + dto.getCurrencyType());
